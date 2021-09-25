@@ -1,0 +1,12 @@
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/controller/AuthController.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/model/JwtResponse.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/model/User.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/config/JwtTokenUtil.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/repository/UserRepo.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/App.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/model/JwtRequest.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/config/JwtRequestFilter.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/config/WebSecurityConfig.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/config/JwtAuthenticationEntryPoint.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/model/UserDTO.java
+/home/finkin/Projects/htw/songsMS/auth-service/src/main/java/htw/kbe/authentification/service/JwtUserDetailsService.java
