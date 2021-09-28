@@ -1,14 +1,15 @@
 server:
-  port: 9002
+  port: 8088
 
 spring:
   application:
-    name: user-service
+    name: song-service
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
+
 
 jwt:
   secret: BvPHGM8C0ia4uOuxxqPD5DTbWC9F9TWvPStp3pb7ARo0oK2mJ3pd3YG4lxA9i8bj6OTbadwezxgeEByY

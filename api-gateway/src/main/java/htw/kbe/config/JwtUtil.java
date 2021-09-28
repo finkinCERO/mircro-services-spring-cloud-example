@@ -19,20 +19,33 @@ public class JwtUtil {
     private Key key;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        try {
+            Claims c = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+            return c;
+        } catch (Exception ex) {
+            System.out.println("#### #### ### getAllClaimsFromToken error");
+        }
+        return null;
     }
 
     private boolean isTokenExpired(String token) {
-        return this.getAllClaimsFromToken(token).getExpiration().before(new Date());
+        Claims c = this.getAllClaimsFromToken(token);
+        System.out.println("#### #### ### expire:" + c.getExpiration()+"| now:"+new Date().toString());
+
+        System.out.println("#### #### ### expire:" + c.getExpiration().before(new Date()));
+        return c.getExpiration().before(new Date());
     }
 
     public boolean isInvalid(String token) {
-        return this.isTokenExpired(token);
+
+        boolean b = this.isTokenExpired(token);
+        System.out.println("### is invalid:" + b + " negate: " + !b);
+        return b;
     }
 
 }

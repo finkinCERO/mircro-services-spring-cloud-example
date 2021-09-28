@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -19,4 +20,5 @@ public class AuthApp {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
 }

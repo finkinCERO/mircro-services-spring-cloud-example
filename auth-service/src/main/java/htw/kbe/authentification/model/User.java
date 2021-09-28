@@ -9,10 +9,10 @@ public class User {
     @Id
     @Column(name = "username", length = 50, nullable = false)
     private String username;
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, nullable = true)
     @JsonIgnore
     private String firstname;
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, nullable = true)
     @JsonIgnore
     private String lastname;
     @Column(name = "password", length = 100, nullable = false)

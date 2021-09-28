@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -12,6 +13,7 @@
         <module name="api-gateway" />
         <module name="hello" />
         <module name="user-service" />
+        <module name="song-service" />
         <module name="service-registry" />
       </profile>
     </annotationProcessing>
@@ -29,6 +31,7 @@
       <module name="service-registery" options="-parameters" />
       <module name="service-registry" options="-parameters" />
       <module name="service-users" options="-parameters" />
+      <module name="song-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="usermangement-service" options="-parameters" />
     </option>

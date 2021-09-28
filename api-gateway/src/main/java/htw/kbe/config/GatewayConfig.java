@@ -28,6 +28,13 @@ public class GatewayConfig {
                 .route("auth-service", r -> r.path("/auth/**")
                         .filters(f -> f.filter(filter))
                         .uri("lb://auth-service"))
+
+                .route("auth-service", r -> r.path("/songs/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://song-service"))
+                .route("auth-service", r -> r.path("/songLists/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://song-service"))
                 .build();
     }
 

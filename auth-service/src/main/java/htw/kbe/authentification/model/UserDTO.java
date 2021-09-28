@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Data
 public class UserDTO {
@@ -16,5 +14,13 @@ public class UserDTO {
 
     private String firstname;
     private String lastname;
+
+    public UserDTO(String username, String password, String firstname, String lastname){
+        this.username = username;
+        this.password = password;
+        this.firstname = firstname;
+        this.lastname = lastname;
+    }
+    public UserDTO(){}
 
 }
