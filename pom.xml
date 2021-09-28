@@ -17,8 +17,9 @@
         <module>service-registry</module>
         <module>api-gateway</module>
         <module>auth-service</module>
-        <module>service-users</module>
         <module>hello</module>
+        <module>user-service</module>
+        <module>song-service</module>
     </modules>
 
     <properties>

@@ -1,17 +1,18 @@
 package htw.kbe.authentification.model;
 
-import java.io.Serializable;
 
-public class JwtResponse implements Serializable {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    private static final long serialVersionUID = -8091879091924046844L;
-    private final String jwttoken;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class JwtResponse {
 
-    public JwtResponse(String jwttoken) {
-        this.jwttoken = jwttoken;
-    }
+    private String accessToken;
+    private String refreshToken;
 
-    public String getToken() {
-        return this.jwttoken;
-    }
 }

@@ -1,9 +1,10 @@
 package htw.kbe.authentification.model;
+import lombok.Builder;
+import lombok.Data;
 
-
-import java.io.Serializable;
-
-public class JwtRequest implements Serializable {
+@Data
+@Builder
+public class JwtRequest {
 
     private static final long serialVersionUID = 5926468583005150707L;
 
