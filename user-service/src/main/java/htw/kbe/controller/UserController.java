@@ -36,17 +36,10 @@ public class UserController {
 
 
     @PostMapping(value = "/verify")
-    public User verifyUser(@RequestBody User user) {
+    public User verifyUser(@RequestBody String usertoken) {
         System.out.println("Hello POST User verify");
-        boolean b = userService.verify(user);
 
-        if(b) {
 
-            System.out.println("### user is okay");
-            User u = userService.getUser(user.getUsername());
-            u.setPassword("******");
-            return u;
-        }
         return null;
 
 

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 //@JsonIgnoreProperties(value="songList")
-@Table(name="songList")
+@Table(name="songlist")
 public class SongList  {
 
     @Id
@@ -47,7 +47,7 @@ public class SongList  {
 
     @JoinColumn(name="owner", nullable=true)
     private String owner;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})	//WAS EAGER, WAS CASCADEtYPE.MERGE
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})	//WAS EAGER, WAS CASCADEtYPE.MERGE
     @JoinTable(name = "songlists_songs",
             joinColumns =
                     {@JoinColumn(name = "songListId", referencedColumnName = "id")},

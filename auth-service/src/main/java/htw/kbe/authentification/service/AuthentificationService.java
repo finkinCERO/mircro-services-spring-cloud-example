@@ -66,6 +66,10 @@ public class AuthentificationService implements UserDetailsService {
         }
     }
 
+    public String getUsernameFromToken(String token){
+        return  jwt.getUsernameFromToken(token);
+    }
+
     // login to get token
     public JwtResponse login(JwtRequest authRequest) {
         //do validation if user already exists
