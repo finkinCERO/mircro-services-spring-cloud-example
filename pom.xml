@@ -20,6 +20,7 @@
         <module>hello</module>
         <module>user-service</module>
         <module>song-service</module>
+        <module>picture-service</module>
     </modules>
 
     <properties>

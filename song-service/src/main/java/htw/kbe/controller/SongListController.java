@@ -38,14 +38,14 @@ public class SongListController {
     public ResponseEntity<List<SongList>> getSongListFromUserName(@RequestParam("username") String username, Principal principal) {
         //Optional<SongList> songlist = songListRepo.findByOwner(userId);
         try {
-            System.out.println("### name: "+principal.getName());
+            System.out.println("### name: " + principal.getName());
             String _username = "davis";
             if (principal != null) _username = principal.getName();
             String u = "user";//userRepo.findByUsername(username);
 
             List<SongList> songs = songListRepo.findByOwner(u);
             List<SongList> result = new ArrayList<>();
-            if (u == null) { 
+            if (u == null) {
                 return new ResponseEntity<List<SongList>>(result,
                         HttpStatus.NOT_FOUND);
             }
@@ -61,8 +61,7 @@ public class SongListController {
             System.out.println("Null Pointer...");
             return new ResponseEntity<List<SongList>>(new ArrayList<SongList>(),
                     HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
 
             System.out.println("Another Error...");
             return new ResponseEntity<List<SongList>>(new ArrayList<SongList>(),
@@ -71,12 +70,12 @@ public class SongListController {
     }
 
     @GetMapping(value = "/{listId}")
-    public ResponseEntity<SongList> getSongList(@PathVariable("listId") String listId, @RequestHeader("Authorization")String token) {
+    public ResponseEntity<SongList> getSongList(@PathVariable("listId") String listId, @RequestHeader("Authorization") String token) {
         //Optional<SongList> songlist = songListRepo.findByOwner(userId);
         try {
             // for testing
 
-            String user = restTemplate.getForObject("http://auth-service/auth/"+token, String.class);
+            String user = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
 
             SongList sl = songListRepo.findById(Integer.parseInt(listId)).get();
             if (sl.getOwner().equals(user))
@@ -104,17 +103,24 @@ public class SongListController {
         System.out.println("Hello POST SongList");
         try {
             System.out.println("### trying creating SongList");
-            String user = restTemplate.getForObject("http://auth-service/auth/"+token, String.class);
-            System.out.println("### username: "+user);
+            String user = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
+            System.out.println("### username: " + user);
+
 
             songlist.setOwner(user);
+            System.out.println("### owner set...");
             //user.getSongLists().add(songlist);
             // if songs are bad
+            if(songlist.getSongList().size()==0){
+                return new ResponseEntity<SongList>(new SongList(),
+                        HttpStatus.NO_CONTENT);
+            }
             for (Song s : songlist.getSongList()) {
                 if (s.getTitle() == null || s.getTitle().replace(" ", "").equals(""))
                     return new ResponseEntity<SongList>(new SongList(),
                             HttpStatus.BAD_REQUEST);
             }
+            System.out.println("songlist: "+songlist.getName());
             // if songlist hasnt a name:
             if (songlist.getName() == null || songlist.getName().replace(" ", "").equals(""))
                 return new ResponseEntity<SongList>(new SongList(),
@@ -129,17 +135,17 @@ public class SongListController {
             return new ResponseEntity<SongList>(list, responseHeaders,
                     HttpStatus.ACCEPTED);
         } catch (Exception e) {
-            System.out.println("Exception: "+ e.getStackTrace());
+            System.out.println("Exception: " + e.getStackTrace());
             return new ResponseEntity<SongList>(new SongList(),
                     HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping(value = "/{id}", produces = {"text/plain"})
+    @DeleteMapping(value = "/{id}", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<String> deleteSongList(@PathVariable(value = "id") Integer id, @RequestHeader("Authorization") String token)
             throws IOException {
         try {
-            String username = restTemplate.getForObject("http://auth-service/auth/"+token, String.class);
+            String username = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
             Optional<SongList> sl = songListRepo.findById(id);
             if (!sl.isPresent()) {
                 return new ResponseEntity<String>("song list doesn't exist", HttpStatus.NOT_FOUND);

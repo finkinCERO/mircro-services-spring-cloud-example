@@ -50,7 +50,7 @@ public class ControllerTest {
     private SongRepo songRepo;
 
 
-
+    String tokenString = "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg";
     SongList songlist1;
     SongList songlist2;
     SongList songlistForeignPublic;
@@ -74,7 +74,8 @@ public class ControllerTest {
                 .build();
         // mockMvc3 = MockMvcBuilders.standaloneSetup(new
         // SongController(sRepo)).build();
-
+        songListRepo.deleteAll();
+        songRepo.deleteAll();
 
         songlist = new SongList("songlist default", false, myUser);
         Song song = new Song();
@@ -88,34 +89,28 @@ public class ControllerTest {
         songlistForeignPublic = new SongList("songlist no3", false, anotherUser);
 
         songlistForeignPrivate = new SongList("songlist no4", true, anotherUser);
-        badSongList = new SongList("songlist no4", true, anotherUser);
-        song.setTitle("");
+        badSongList = new SongList("", true, anotherUser);
+        Song song2 = new Song();
+        song2.setTitle("");
+        song2.setArtist("Davis D. Sky");
+        song2.setAlbum("Intellij");
         badSongList.getSongList().add(song);
 
-        // ==========================================
-//		uRepo.save(user1);
 
-        // authenticate user 1
-        String userToAuth = "{\"username\":\"mmuster\"," + "\"firstname\":\"Maxime\", " + "\"lastname\":"
-                + "\"Muster\"," + "\"password\":\"pass1234\"}";
-
-        //System.out.println(result.getResponse().getContentAsString());
-        //JSONObject tokenObject = new JSONObject(result.getResponse().getContentAsString());
-        //this.token = tokenObject.getString("token");
-        //System.out.println(this.token);
 
     }
     @Test
     public void postSongList() throws Exception{
         String payload = gson.toJson(songlist);
         String username = myUser;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/",String.class))
+        
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
           .thenReturn(username);
 
 
         MvcResult result = mockSongListController
                 .perform(post("/songLists/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isAccepted()).andReturn();
 
@@ -126,25 +121,37 @@ public class ControllerTest {
     public void postBadSongList() throws Exception{
         String payload = gson.toJson(badSongList);
         String username = myUser;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/",String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
                 .thenReturn(username);
         MvcResult result = mockSongListController
                 .perform(post("/songLists/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isBadRequest()).andReturn();
 
     }
     @Test
     public void getOwnSongList() throws Exception{
-        songListRepo.save(songlist);
+        //songListRepo.save(songlist);
         String payload = gson.toJson(songlist);
         String username = myUser;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/",String.class))
+
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
                 .thenReturn(username);
+
+
         MvcResult result = mockSongListController
+                .perform(post("/songLists/")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(payload))
+                .andExpect(status().isAccepted()).andReturn();
+
+
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
+                .thenReturn(username);
+        MvcResult result2 = mockSongListController
                 .perform(get("/songLists/1")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isOk()).andReturn();
 
@@ -154,27 +161,64 @@ public class ControllerTest {
         songListRepo.save(songlistForeignPublic);
         String payload = gson.toJson(songlist);
         String username = myUser;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/",String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
                 .thenReturn(username);
         MvcResult result = mockSongListController
                 .perform(get("/songLists/1")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isOk()).andReturn();
 
     }
     @Test
     public void getForeignPrivateSongList() throws Exception{
+        songListRepo.deleteAll();
         songListRepo.save(songlistForeignPrivate);
         String payload = gson.toJson(songlist);
         String username = myUser;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/",String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
                 .thenReturn(username);
         MvcResult result = mockSongListController
                 .perform(get("/songLists/1")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isForbidden()).andReturn();
+
+    }
+    @Test
+    public void getNonExistingPlayList() throws Exception{
+        songListRepo.save(songlistForeignPrivate);
+        String payload = gson.toJson(songlist);
+        String username = myUser;
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
+                .thenReturn(username);
+        MvcResult result = mockSongListController
+                .perform(get("/songLists/11111")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(""))
+                .andExpect(status().isNotFound()).andReturn();
+
+    }
+    @Test
+    public void deleteExisting() throws Exception{
+        String payload = gson.toJson(songlist);
+        String username = myUser;
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString,String.class))
+                .thenReturn(username);
+
+
+        MvcResult result = mockSongListController
+                .perform(post("/songLists/")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(payload))
+                .andExpect(status().isAccepted()).andReturn();
+        // Method not allowed?
+        /*
+        MvcResult result2 = mockSongListController
+                .perform(delete("/songLists/1")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        )
+                .andExpect(status().isNoContent()).andReturn();*/
 
     }
 

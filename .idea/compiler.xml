@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
+        <module name="picture-service" />
         <module name="hello-service" />
         <module name="service-registery" />
         <module name="api-gateway" />
@@ -28,6 +29,7 @@
       <module name="auth-service" options="-parameters" />
       <module name="hello" options="-parameters" />
       <module name="hello-service" options="-parameters" />
+      <module name="picture-service" options="-parameters" />
       <module name="service-registery" options="-parameters" />
       <module name="service-registry" options="-parameters" />
       <module name="service-users" options="-parameters" />
