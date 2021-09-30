@@ -48,6 +48,9 @@ public class Song {
     private String album;
     @Column(name = "released")
     private Integer released;
+
+    @Column(name = "picture")
+    private String picture;
     @JsonIgnore
     @JsonIgnoreProperties({"songList"})
     @ManyToMany(
@@ -126,6 +129,14 @@ public class Song {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 
     /**
