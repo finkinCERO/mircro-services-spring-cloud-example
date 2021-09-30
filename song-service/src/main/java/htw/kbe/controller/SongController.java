@@ -33,7 +33,7 @@ public class SongController {
                 return new ResponseEntity<Optional>(song, HttpStatus.OK);
             }
             return new ResponseEntity<Optional>(HttpStatus.NOT_FOUND);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<Optional>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -60,9 +60,11 @@ public class SongController {
     public ResponseEntity<Song> add(@RequestBody Song song) {
         System.out.println("Hello POST Song");
         try {
+            if (song.getTitle().replaceAll(" ", "").equals(""))
+                return new ResponseEntity<Song>(song, HttpStatus.BAD_REQUEST);
             songRepo.save(song);
             return new ResponseEntity<Song>(song, HttpStatus.OK);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return new ResponseEntity<Song>(song, HttpStatus.BAD_REQUEST);
         }
     }
@@ -81,12 +83,13 @@ public class SongController {
             else if (song.getTitle() == null || song.getTitle().replace(" ", "").equals(""))
                 return new ResponseEntity<Song>(song, HttpStatus.CONFLICT);
             else {
-                Song songToUpdate = songRepo.getOne(id);
+                Song songToUpdate = songRepo.findById(id).get();
                 songToUpdate.setTitle(song.getTitle());
                 songToUpdate.setArtist(song.getArtist());
                 songToUpdate.setAlbum(song.getAlbum());
                 songToUpdate.setReleased(song.getReleased());
                 songRepo.save(songToUpdate);
+                songRepo.flush();
                 return new ResponseEntity<Song>(songToUpdate, HttpStatus.ACCEPTED);
             }
             // check songId !=null -> bad request
@@ -103,7 +106,8 @@ public class SongController {
     @DeleteMapping(value = "/{id}", consumes = {"application/json", "application/xml"}, produces = {"text/plain"})
     public ResponseEntity<String> deleteSong(@PathVariable(value = "id") Integer id) throws IOException {
         try {
-            if (songRepo.findById(id) == null)
+            Optional<Song> s = songRepo.findById(id);
+            if (!s.isPresent())
                 return new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
             songRepo.deleteById(id);
             return new ResponseEntity<String>("", HttpStatus.NO_CONTENT);

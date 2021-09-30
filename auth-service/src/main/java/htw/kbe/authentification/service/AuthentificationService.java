@@ -26,6 +26,7 @@ public class AuthentificationService implements UserDetailsService {
     private final JwtTokenUtil jwt;
     private final UserRepository userRepo;
     private final AuthenticationManager authenticationManager;
+
     @Autowired
     public AuthentificationService(RestTemplate restTemplate,
                                    final JwtTokenUtil jwt, UserRepository repository, AuthenticationManager manager) {
@@ -45,8 +46,14 @@ public class AuthentificationService implements UserDetailsService {
 
             //Assert.notNull(userVO, "Failed to register user. Please try again later");
             if (userVO != null)
-                return new JwtResponse("", "", "user exists", true);
-            System.out.println("### user: " + userVO);
+                return new JwtResponse("", "", "error: ser exists", true);
+
+            if (authRequest.getUsername() == null || authRequest.getUsername().replaceAll(" ", "").equals(""))
+                return new JwtResponse("", "", "error: username not set", true);
+            if (authRequest.getPassword() == null || authRequest.getPassword().replaceAll(" ", "").equals(""))
+                return new JwtResponse("", "", "error: no password", true);
+            if (authRequest.getPassword() != null && authRequest.getPassword().length() < 6)
+                return new JwtResponse("", "", "error: password to short", true);
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             User u = new User();
             u.setUsername(authRequest.getUsername());
@@ -56,33 +63,33 @@ public class AuthentificationService implements UserDetailsService {
             String refreshToken = jwt.generate(userVO, "REFRESH");
 
             return new JwtResponse(accessToken, refreshToken, "success", false);
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             System.out.println("### Null Pointer error");
-            return new JwtResponse("", "", "", true);
+            return new JwtResponse("", "", "error:", true);
         } catch (Exception e) {
-            System.out.println("### Type: "+e.getStackTrace());
+            System.out.println("### Type: " + e.getStackTrace());
             System.out.println("### Error register");
-            return new JwtResponse("", "", "", true);
+            return new JwtResponse("", "", "error:", true);
         }
     }
 
-    public String getUsernameFromToken(String token){
-        return  jwt.getUsernameFromToken(token);
+    public String getUsernameFromToken(String token) {
+        return jwt.getUsernameFromToken(token);
     }
 
     // login to get token
     public JwtResponse login(JwtRequest authRequest) {
         //do validation if user already exists
         //authRequest.setPassword(BCrypt.hashpw(authRequest.getPassword(), BCrypt.gensalt()));
-        try{
+        try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
             System.out.println("authentificated...");
             User user = userRepo.findByUsername(authRequest.getUsername());
             String accessToken = jwt.generate(user, "ACCESS");
             String refreshToken = jwt.generate(user, "REFRESH");
             return new JwtResponse(accessToken, refreshToken, "success", false);
-        } catch (Exception e){
-            return new JwtResponse("", "", "user or password incorrect", true);
+        } catch (Exception e) {
+            return new JwtResponse("", "", "error: user or password incorrect", true);
 
         }
 

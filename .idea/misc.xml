@@ -9,7 +9,9 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/hello/pom.xml" />
         <option value="$PROJECT_DIR$/service-users/pom.xml" />
+        <option value="$PROJECT_DIR$/user-service/pom.xml" />
         <option value="$PROJECT_DIR$/usermangement-service/pom.xml" />
       </set>
     </option>

@@ -35,16 +35,12 @@ public class JwtUtil {
 
     private boolean isTokenExpired(String token) {
         Claims c = this.getAllClaimsFromToken(token);
-        System.out.println("#### #### ### expire:" + c.getExpiration()+"| now:"+new Date().toString());
-
-        System.out.println("#### #### ### expire:" + c.getExpiration().before(new Date()));
         return c.getExpiration().before(new Date());
     }
 
     public boolean isInvalid(String token) {
 
         boolean b = this.isTokenExpired(token);
-        System.out.println("### is invalid:" + b + " negate: " + !b);
         return b;
     }
 

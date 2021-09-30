@@ -45,6 +45,8 @@ public class PictureTest {
     private String myUser = "test-user";
     private String anotherUser = "charly";
     private Gson gson;
+    String tokenString = "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg";
+    String defaultTitle = "picture for song";
 
     @BeforeEach
     public void setupMockMvc() throws Exception {
@@ -57,11 +59,11 @@ public class PictureTest {
     @Test
     public void saveImageFromUrl() throws Exception {
         String payload = picture;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         MvcResult result = mockPictureController
-                .perform(post("/pictures/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isAccepted()).andReturn();
         System.out.println("### Return:" + result.getResponse().getContentAsString());
@@ -71,11 +73,11 @@ public class PictureTest {
     @Test
     public void saveImageFromBadUrl() throws Exception {
         String payload = "dfkljasdföja";
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         MvcResult result = mockPictureController
-                .perform(post("/pictures/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isBadRequest()).andReturn();
         System.out.println("### Return:" + result.getResponse().getContentAsString());
@@ -84,17 +86,17 @@ public class PictureTest {
     @Test
     public void getImage() throws Exception {
         String payload = picture;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         MvcResult picResult = mockPictureController
-                .perform(post("/pictures/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isAccepted()).andReturn();
         String id = picResult.getResponse().getContentAsString();
         MvcResult result = mockPictureController
                 .perform(get("/pictures/" + id)
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isOk()).andReturn();
         System.out.println("### Return:" + result.getResponse().getContentAsString());
@@ -105,37 +107,70 @@ public class PictureTest {
         String id = "non-existing-image-id";
         MvcResult result = mockPictureController
                 .perform(get("/pictures/" + id)
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isNotFound()).andReturn();
         System.out.println("### Return:" + result.getResponse().getContentAsString());
     }
 
     @Test
-    public void deleteImage() throws Exception {
+    public void deleteOwnImage() throws Exception {
         String payload = picture;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         MvcResult picResult = mockPictureController
-                .perform(post("/pictures/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isAccepted()).andReturn();
 
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         String id = picResult.getResponse().getContentAsString();
         MvcResult result = mockPictureController
                 .perform(delete("/pictures/" + id)
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isAccepted()).andReturn();
 
         MvcResult picResult2 = mockPictureController
                 .perform(get("/pictures/" + id)
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isNotFound()).andReturn();
+    }
+    // try deleting not own
+    @Test
+    public void deleteNotOwnImage() throws Exception {
+        String payload = picture;
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn(myUser);
+        MvcResult picResult = mockPictureController
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(payload))
+                .andExpect(status().isAccepted()).andReturn();
+        System.out.println("pass 1");
+
+
+
+        String id = picResult.getResponse().getContentAsString();
+        MvcResult result = mockPictureController
+                .perform(get("/pictures/" + id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(""))
+                .andExpect(status().isOk()).andReturn();
+
+        // return another user when auth-service is asked
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn("yolandi");
+
+        System.out.println("pass 2");
+        MvcResult picResult2 = mockPictureController
+                .perform(delete("/pictures/" + id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(""))
+                .andExpect(status().isUnauthorized()).andReturn();
     }
 
     @Test
@@ -143,36 +178,137 @@ public class PictureTest {
 
 
         String payload = picture;
-        Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         MvcResult picResult = mockPictureController
-                .perform(post("/pictures/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(payload))
                 .andExpect(status().isAccepted()).andReturn();
         String id = picResult.getResponse().getContentAsString();
+
         MvcResult result = mockPictureController
                 .perform(get("/pictures/" + id)
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
                         .content(""))
                 .andExpect(status().isOk()).andReturn();
+        System.out.println("Got pic -> "+result.getResponse().getContentAsString());
+        String json = result.getResponse().getContentAsString().replace(defaultTitle, "new song image");
 
-        JsonObject pictureObj = new Gson().fromJson(result.getResponse().getContentAsString(), JsonObject.class);
-        pictureObj.addProperty("title","new name");
-        //pictureObj.setTitle("new title");
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn(myUser);
 
-        /*Mockito.when(restTemplate.getForObject("http://auth-service/auth/", String.class))
+        MvcResult result2 = mockPictureController
+                .perform(put("/pictures/"+id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(json))
+                .andExpect(status().isAccepted()).andReturn();
+        System.out.println("### Return:" + result2.getResponse().getContentAsString());
+
+        assertEquals(true,result2.getResponse().getContentAsString().contains("new song image"));
+
+    }
+    @Test
+    public void updateNotOwnImage() throws Exception {
+
+
+        String payload = picture;
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn(myUser);
+        MvcResult picResult = mockPictureController
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(payload))
+                .andExpect(status().isAccepted()).andReturn();
+        String id = picResult.getResponse().getContentAsString();
+
+        MvcResult result = mockPictureController
+                .perform(get("/pictures/" + id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(""))
+                .andExpect(status().isOk()).andReturn();
+        System.out.println("Got pic -> "+result.getResponse().getContentAsString());
+        String json = result.getResponse().getContentAsString().replace(defaultTitle, "new song image");
+
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn("yolandi");
+        MvcResult result2 = mockPictureController
+                .perform(put("/pictures/"+id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(json))
+                .andExpect(status().isUnauthorized()).andReturn();
+        System.out.println("### Return:" + result2.getResponse().getContentAsString());
+
+        //assertEquals(false,result2.getResponse().getContentAsString().contains("new song image"));
+
+    }
+    @Test
+    public void updateNonExisting() throws Exception {
+
+
+        String payload = picture;
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn(myUser);
+        MvcResult picResult = mockPictureController
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(payload))
+                .andExpect(status().isAccepted()).andReturn();
+        String id = picResult.getResponse().getContentAsString();
+
+        MvcResult result = mockPictureController
+                .perform(get("/pictures/" + id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(""))
+                .andExpect(status().isOk()).andReturn();
+        System.out.println("Got pic -> "+result.getResponse().getContentAsString());
+        String json = result.getResponse().getContentAsString().replace(defaultTitle, "new song image");
+
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn(anotherUser);
+        MvcResult result2 = mockPictureController
+                .perform(put("/pictures/123123123"+id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(json))
+                .andExpect(status().isNotFound()).andReturn();
+        System.out.println("### Return:" + result2.getResponse().getContentAsString());
+
+        //assertEquals(false,result2.getResponse().getContentAsString().contains("new song image"));
+
+    }
+    /*
+    @Test
+    public void updateMethodNotAllowed() throws Exception {
+
+
+        String payload = picture;
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
+                .thenReturn(myUser);
+        MvcResult picResult = mockPictureController
+                .perform(post("/pictures/"+defaultTitle)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(payload))
+                .andExpect(status().isAccepted()).andReturn();
+        String id = picResult.getResponse().getContentAsString();
+
+        MvcResult result = mockPictureController
+                .perform(get("/pictures/" + id)
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(""))
+                .andExpect(status().isOk()).andReturn();
+        System.out.println("Got pic -> "+result.getResponse().getContentAsString());
+        String json = result.getResponse().getContentAsString().replace(defaultTitle, "new song image");
+
+        Mockito.when(restTemplate.getForObject("http://auth-service/auth/"+tokenString, String.class))
                 .thenReturn(myUser);
         MvcResult result2 = mockPictureController
                 .perform(put("/pictures/")
-                        .header("Content-Type", "application/json").header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6ImNlcnNmbyIsInN1YiI6ImNlcnNmbyIsImlhdCI6MTYzMjg2OTg2NSwiZXhwIjoxNjMyOTU2MjY1fQ.GHwh75m8HvILtlPbg8zVMER4uJEBmirHivLiy9WPwNgnvoMByUKXbqR2NIx7_-S8N_HVUcrWmhzy06DHm-rtPg")
-                        .content(gson.toJson(pictureObj)))
-                .andExpect(status().isAccepted()).andReturn();
-        System.out.println("### Return:" + result.getResponse().getContentAsString());
+                        .header("Content-Type", "application/json").header("Authorization", tokenString)
+                        .content(json))
+                .andExpect(status().isNotFound()).andReturn();
+        System.out.println("### Return:" + result2.getResponse().getContentAsString());
 
-        PictureObject pictureUpdated= new Gson().fromJson(result2.getResponse().getContentAsString(), PictureObject.class);*/
+        //assertEquals(false,result2.getResponse().getContentAsString().contains("new song image"));
 
-        //assertEquals("new title",pictureUpdated.getTitle());
-
-    }
+    }*/
 }

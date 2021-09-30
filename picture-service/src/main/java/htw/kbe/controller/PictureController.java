@@ -36,6 +36,17 @@ public class PictureController {
         this.restTemplate = rest;
     }
 
+    @GetMapping(value = "/", consumes = {"application/json", "application/xml"}, produces = {"application/json",
+            "application/xml"})
+    public String helloPictures(
+            ) {
+        try {
+            System.out.println("Hello get picture...");
+            return "hello world";
+        } catch (Exception e) {
+            return "exception hello";
+        }
+    }
 
     @GetMapping(value = "/{id}", consumes = {"application/json", "application/xml"}, produces = {"application/json",
             "application/xml"})
@@ -44,28 +55,29 @@ public class PictureController {
         try {
             System.out.println("Hello get picture...");
             PictureObject pic = pictureService.getPicture(id);
-            return new ResponseEntity<PictureObject>(pic,HttpStatus.OK);
+            return new ResponseEntity<PictureObject>(pic, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<PictureObject>(new PictureObject(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<PictureObject>(new PictureObject(), HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping(value = "/")
-    public ResponseEntity<String> verifyUser(@RequestBody String _url, @RequestHeader("Authorization") String token) {
+    @PostMapping(value = "/{title}")
+    public ResponseEntity<String> verifyUser(@PathVariable(value = "title") String title, @RequestBody String _url, @RequestHeader("Authorization") String token) {
         try {
             System.out.println("Hello POST User verify");
             String user = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
             URL url = new URL(_url);
-            if(user==null) user="test-user";
             //String path = tDir + "tmp" + ".jpg";
             File file = new File("tmp" + new Date().getTime() + ".jpg");
             FileUtils.copyURLToFile(url, file);
             file.deleteOnExit();
-            String id = pictureService.addPicture("song image", user, file);
+            String id = pictureService.addPicture(title, user, file);
             return new ResponseEntity<String>(id, HttpStatus.ACCEPTED);
 
         } catch (IOException e) {
             e.printStackTrace();
+            return new ResponseEntity<String>("", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
             return new ResponseEntity<String>("", HttpStatus.BAD_REQUEST);
         }
         //create File object
@@ -73,39 +85,38 @@ public class PictureController {
     }
 
     @DeleteMapping(value = "/{id}", consumes = {"application/json", "application/xml"}, produces = {"text/plain"})
-    public ResponseEntity<String> deleteImage(@PathVariable(value = "id") String id, @RequestHeader("Authorization") String token) throws IOException  {
+    public ResponseEntity<String> deleteImage(@PathVariable(value = "id") String id, @RequestHeader("Authorization") String token) throws IOException {
 
         try {
 
             System.out.println("Hello Delete...");
             PictureObject pic = pictureService.getPicture(id);
             String user = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
-            if(user==null) user="test-user";
-            if(pic.getOwner().equals(user)){
+            System.out.println("user: " + user + " owner:" + pic.getOwner());
+            if (pic.getOwner().equals(user)) {
                 pictureService.delete(pic);
-                return new ResponseEntity<String>("",HttpStatus.ACCEPTED);
-            } else  return new ResponseEntity<String>("",HttpStatus.UNAUTHORIZED);
-        } catch (Exception e){
-            return new ResponseEntity<String>("",HttpStatus.NOT_FOUND);
+                return new ResponseEntity<String>("", HttpStatus.ACCEPTED);
+            } else return new ResponseEntity<String>("", HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping(value = "/", consumes = {"application/json", "application/xml"}, produces = {"application/json",
+    @PutMapping(value = "/{name}", consumes = {"application/json", "application/xml"}, produces = {"application/json",
             "application/xml"})
-    public ResponseEntity<PictureObject> getUser( @RequestBody PictureObject picture,
-            @PathVariable(value = "name") String name, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<PictureObject> getUser(@RequestBody PictureObject picture,
+                                                 @PathVariable(value = "name") String name, @RequestHeader("Authorization") String token) {
         // get pictureobject by name...
         try {
-            System.out.println("Hello Put...");
-            PictureObject pic = pictureService.getPicture(picture.getId().toString());
+            System.out.println("Hello Put... " + picture.getTitle());
+            PictureObject pic = pictureService.getPicture(name);
             String user = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
-            if(user==null) user="test-user";
-            if(pic.getOwner().equals(user)){
-                pic = pictureService.update(pic);
-                return new ResponseEntity<PictureObject>(pic,HttpStatus.ACCEPTED);
-            } else  return new ResponseEntity<PictureObject>(pic,HttpStatus.UNAUTHORIZED);
-        } catch (Exception e){
-            return new ResponseEntity<PictureObject>(new PictureObject(),HttpStatus.NOT_FOUND);
+            System.out.println("owner: " + pic.getOwner() + " user: " + user);
+            if (pic.getOwner().equals(user)) {
+                return new ResponseEntity<PictureObject>(pictureService.update(picture), HttpStatus.ACCEPTED);
+            } else return new ResponseEntity<PictureObject>(pic, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<PictureObject>(new PictureObject(), HttpStatus.NOT_FOUND);
         }
     }
 

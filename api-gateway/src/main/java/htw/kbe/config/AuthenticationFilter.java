@@ -30,8 +30,10 @@ public class AuthenticationFilter implements GatewayFilter {
             if (this.isAuthMissing(request))
                 return this.onError(exchange, "Authorization header is missing in request", HttpStatus.FORBIDDEN);
             final String token = this.getAuthHeader(request);
-            if (jwtUtil.isInvalid(token))
+            if (jwtUtil.isInvalid(token)){
+                System.out.println("token: "+token);
                 return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
+            }
             System.out.println("### populate... "+exchange.getRequest().getPath());
             this.populateRequestWithHeaders(exchange, token);
         }
@@ -54,6 +56,7 @@ public class AuthenticationFilter implements GatewayFilter {
 
     private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
         Claims claims = jwtUtil.getAllClaimsFromToken(token);
+        System.out.println("claims -> "+claims.getId());
         exchange.getRequest().mutate()
                 .header("id", String.valueOf(claims.get("id")))
                 .build();

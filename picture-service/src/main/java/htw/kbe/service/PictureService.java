@@ -46,6 +46,7 @@ public class PictureService {
         return "ok";
     }
     public PictureObject update(PictureObject pic) {
+        System.out.println("title: "+pic.getTitle());
         return pictureRepo.save(pic);
 
     }

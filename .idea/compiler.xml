@@ -9,17 +9,17 @@
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
         <module name="picture-service" />
-        <module name="hello-service" />
         <module name="service-registery" />
         <module name="api-gateway" />
         <module name="hello" />
-        <module name="user-service" />
         <module name="song-service" />
         <module name="service-registry" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="hello-service" target="1.8" />
       <module name="service-users" target="1.8" />
+      <module name="user-service" target="11" />
       <module name="usermangement-service" target="1.8" />
     </bytecodeTargetLevel>
   </component>

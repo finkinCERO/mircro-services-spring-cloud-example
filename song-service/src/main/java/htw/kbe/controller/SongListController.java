@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 @RestController
-@RequestMapping(value = "/songLists")
+@RequestMapping(value = "/playlists")
 public class SongListController {
 
     @Autowired
@@ -35,20 +35,20 @@ public class SongListController {
 
 
     @GetMapping
-    public ResponseEntity<List<SongList>> getSongListFromUserName(@RequestParam("username") String username, Principal principal) {
+    public ResponseEntity<List<SongList>> getSongListFromUserName(@RequestParam("username") String username, @RequestHeader("Authorization") String token) {
         //Optional<SongList> songlist = songListRepo.findByOwner(userId);
         try {
-            System.out.println("### name: " + principal.getName());
-            String _username = "davis";
-            if (principal != null) _username = principal.getName();
-            String u = "user";//userRepo.findByUsername(username);
-
-            List<SongList> songs = songListRepo.findByOwner(u);
-            List<SongList> result = new ArrayList<>();
-            if (u == null) {
-                return new ResponseEntity<List<SongList>>(result,
+            String _username = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
+            if(username==null || username.equals(""))
+                return new ResponseEntity<List<SongList>>(new ArrayList<SongList>(),
+                        HttpStatus.NOT_FOUND);
+            if (_username == null) {
+                return new ResponseEntity<List<SongList>>(new ArrayList<SongList>(),
                         HttpStatus.NOT_FOUND);
             }
+            List<SongList> songs = songListRepo.findByOwner(username);
+            List<SongList> result = new ArrayList<>();
+
             for (SongList s : songs) {
                 System.out.println("###### -> " + s.getOwner());
                 if (s.getOwner().equals(_username)) result.add(s);
@@ -111,7 +111,7 @@ public class SongListController {
             System.out.println("### owner set...");
             //user.getSongLists().add(songlist);
             // if songs are bad
-            if(songlist.getSongList().size()==0){
+            if (songlist.getSongList().size() == 0) {
                 return new ResponseEntity<SongList>(new SongList(),
                         HttpStatus.NO_CONTENT);
             }
@@ -120,7 +120,7 @@ public class SongListController {
                     return new ResponseEntity<SongList>(new SongList(),
                             HttpStatus.BAD_REQUEST);
             }
-            System.out.println("songlist: "+songlist.getName());
+            System.out.println("songlist: " + songlist.getName());
             // if songlist hasnt a name:
             if (songlist.getName() == null || songlist.getName().replace(" ", "").equals(""))
                 return new ResponseEntity<SongList>(new SongList(),
@@ -159,6 +159,31 @@ public class SongListController {
 
         } catch (Exception e) {
             return new ResponseEntity<String>("resource not found", HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = "application/json")
+    public ResponseEntity<SongList> updateSongList(@PathVariable(value = "id") Integer id, @RequestHeader("Authorization") String token, @RequestBody SongList _sl)
+            throws IOException {
+        try {
+            String username = restTemplate.getForObject("http://auth-service/auth/" + token, String.class);
+            Optional<SongList> sl = songListRepo.findById(id);
+            if (!sl.isPresent()) {
+                return new ResponseEntity<SongList>(_sl, HttpStatus.NOT_FOUND);
+            }
+            if (sl.get().getOwner().equals(username)) {
+                _sl.setOwner(username);
+                SongList list = songListRepo.save(_sl);
+                songListRepo.flush();
+                return new ResponseEntity<SongList>(list, HttpStatus.ACCEPTED);
+            } else if(_sl.getIsPrivate())
+                return new ResponseEntity<SongList>(new SongList(), HttpStatus.FORBIDDEN);
+             else  return new ResponseEntity<SongList>(sl.get(), HttpStatus.FORBIDDEN);
+
+
+        } catch (Exception e) {
+            return new ResponseEntity<SongList>(new SongList(), HttpStatus.NOT_FOUND);
         }
 
     }
