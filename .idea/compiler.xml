@@ -2,18 +2,24 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
         <module name="auth-service" />
+        <module name="picture-service" />
+        <module name="service-registery" />
+        <module name="api-gateway" />
         <module name="hello" />
+        <module name="song-service" />
         <module name="service-registry" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="hello-service" target="1.8" />
       <module name="service-users" target="1.8" />
+      <module name="user-service" target="11" />
       <module name="usermangement-service" target="1.8" />
     </bytecodeTargetLevel>
   </component>
@@ -22,8 +28,13 @@
       <module name="api-gateway" options="-parameters" />
       <module name="auth-service" options="-parameters" />
       <module name="hello" options="-parameters" />
+      <module name="hello-service" options="-parameters" />
+      <module name="picture-service" options="-parameters" />
+      <module name="service-registery" options="-parameters" />
       <module name="service-registry" options="-parameters" />
       <module name="service-users" options="-parameters" />
+      <module name="song-service" options="-parameters" />
+      <module name="user-service" options="-parameters" />
       <module name="usermangement-service" options="-parameters" />
     </option>
   </component>
